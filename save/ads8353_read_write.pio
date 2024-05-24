@@ -1,0 +1,51 @@
+.program ads8353_read_write
+.side_set 2     ; CS, SCLK
+
+; Calls one CMD and returns the result of the previous CMD
+; Hz = 1/4 * PIO Clk
+
+start:
+    pull                   side 3
+    set    x, 15           side 3 [2]   ; Wait a full cycle before next CMD 
+sdi_write:        
+    out    pins, 1         side 2 [1]   ; Update SDI on rising SCLK
+    in     pins, 1         side 0       ; Read SDO_A on falling SCLK
+    jmp    x--, sdi_write  side 0
+    set    x, 30           side 2 [1]    
+loop:
+    jmp    !x, start       side 0 [1] 
+    jmp    x--, loop       side 2 [1] 
+
+% c-sdk {
+static inline void ads8353_read_write_init(PIO pio, 
+                                      uint sm, 
+                                      uint offset, 
+                                      uint sdi, 
+                                      uint sdo_a,
+                                      uint sideset_base, 
+                                      float div) {
+    pio_sm_config c =  ads8353_read_write_program_get_default_config(offset);
+    // Set sideset (SCLK/CS)
+    sm_config_set_sideset_pins(&c, sideset_base);
+    pio_gpio_init(pio, sideset_base);
+    pio_gpio_init(pio, sideset_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base, 2, true);
+    // Set out (SDI)
+    sm_config_set_out_pins(&c, sdi, 1);
+    pio_gpio_init(pio, sdi);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdi, 1, true);
+    sm_config_set_out_shift(&c, true, false, 16);
+    // Set input (SDO)
+    sm_config_set_in_pins(&c, sdo_a);
+    pio_gpio_init(pio, sdo_a);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdo_a, 1, false);
+    // Set clk div
+    sm_config_set_clkdiv(&c, div);
+    // Set up SDO shift
+    sm_config_set_in_shift(&c, false, true, 16);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

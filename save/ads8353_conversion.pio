@@ -1,0 +1,52 @@
+.program ads8353_conversion
+.side_set 2     ; CS, SCLK
+
+; Does osr-1 conversions and returns  SDO_B, SDOA interleaved
+; Hz = 1/2 * PIO Clk
+
+start:
+    out    x, 32           side 3   ; x = conversion_counter
+.wrap_target
+    jmp    x--, next       side 3   ; fancy way to decrement
+next:
+    set    y, 15           side 3   ; idle for 16 cycles
+idle:
+    jmp    !x, start       side 2   ; checking for exit cond during a mandatory noop
+    jmp    y--, idle       side 0
+exit_idle:
+    set    y, 14           side 2
+sdo_read:        
+    in     pins, 2         side 0   ; read SDO on falling SCLK
+    jmp    y--, sdo_read   side 2
+    in     pins, 2         side 0   ; offset last SDO so that we can go to H/H right away
+.wrap
+
+
+% c-sdk {
+static inline void ads8353_conversion_init(PIO pio, 
+                                      uint sm, 
+                                      uint offset, 
+                                      uint sdo_base,
+                                      uint sideset_base) {
+    pio_sm_config c =  ads8353_conversion_program_get_default_config(offset);
+    // Set sideset (SCLK/CS)
+    sm_config_set_sideset_pins(&c, sideset_base);
+    pio_gpio_init(pio, sideset_base);
+    pio_gpio_init(pio, sideset_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base, 2, true);
+    // Set input Shift to LSB
+    sm_config_set_out_shift(&c, false, true, 32);
+    // Set input (SDO)
+    sm_config_set_in_pins(&c, sdo_base);
+    pio_gpio_init(pio, sdo_base);
+    pio_gpio_init(pio, sdo_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdo_base, 2, false);
+    sm_config_set_in_shift(&c, false, true, 32);    // do LSR to preserve bit order
+    // Set Hz to 40 MHz
+    sm_config_set_clkdiv_int_frac(&c, 3, 32);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

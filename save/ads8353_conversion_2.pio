@@ -1,0 +1,84 @@
+.program ads8353_conversion_sclk
+.side_set 2     ; CS, SCLK
+
+; Handles SCLK and CS for conversions
+.wrap_target
+    out    x, 32           side 3   ; x = conversion_counter
+decrement:
+    jmp    x--, setup      side 3   ; fancy way to decrement and wraps to blocking otherwise
+.wrap
+setup:
+    IRQ    SET 0          side 3   ; trigger sdo state machines
+    set    y, 31           side 2   ; idle for 32 cycles
+idle:
+    jmp    !y, decrement   side 0   ; end cycle on low
+    jmp    y--, idle       side 2
+
+.program ads8353_conversion_sdo
+
+; Handles SCLK and CS for a conversion
+start:
+    wait 1 irq 0 [31]               ; idle for first 15.5 cycles
+    set x, 15                   ; set ctr .5 before we start reading
+.wrap_target
+    in pins, 1
+    jmp x--, start
+.wrap
+
+% c-sdk {
+static inline void ads8353_conversion_sclk_init(PIO pio, 
+                                      uint sm, 
+                                      uint offset, 
+                                      uint sideset_base) {
+    pio_sm_config c =  ads8353_conversion_sclk_program_get_default_config(offset);
+    // Set sideset (SCLK/CS)
+    sm_config_set_sideset_pins(&c, sideset_base);
+    pio_gpio_init(pio, sideset_base);
+    pio_gpio_init(pio, sideset_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base, 2, true);
+    // Set input Shift to LSB
+    sm_config_set_out_shift(&c, false, true, 32);
+    // Set Hz to 40 MHz
+    sm_config_set_clkdiv_int_frac(&c, 3, 32);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    //pio_sm_set_enabled(pio, sm, true);
+}
+%}
+
+
+% c-sdk {
+static inline void ads8353_conversion_sdo_init(PIO pio, 
+                                      uint sm,
+                                      uint sm2, 
+                                      uint offset, 
+                                      uint sdo_a,
+                                      uint sdo_b) {
+    //sdo a
+    pio_sm_config c =  ads8353_conversion_program_get_default_config(offset);
+    // Set input (SDO)
+    sm_config_set_in_pins(&c, sdo_base);
+    pio_gpio_init(pio, sdo_base);
+    pio_gpio_init(pio, sdo_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdo_base, 1, false);
+    sm_config_set_in_shift(&c, false, true, 16);    // do LSR to preserve bit order
+    // Set Hz to 40 MHz
+    sm_config_set_clkdiv_int_frac(&c, 3, 32);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+    // sdo b
+    c =  ads8353_conversion_program_get_default_config(offset);
+    // Set input (SDO)
+    sm_config_set_in_pins(&c, sdo_b);
+    pio_gpio_init(pio, sdo_base);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdo_base, 1, false);
+    sm_config_set_in_shift(&c, false, true, 16);   // do LSR to preserve bit order
+    // Set Hz to 40 MHz
+    sm_config_set_clkdiv_int_frac(&c, 3, 32);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

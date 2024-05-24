@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : Project [LMP91000 BLE.PrjPcb]
+   Generated File[LMP91000 BLE.TXT]
+   Generated File[LMP91000 BLE.LDP]
+   Generated File[LMP91000 BLE.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 1:21:22 PM On 5/6/2024

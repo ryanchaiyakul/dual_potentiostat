@@ -1,0 +1,39 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program test_side
+.side_set 2
+; Block until an input word is recieved then lower cs and cycle sclk for x cycles
+
+
+start:
+    pull                     side 0x03 [1]
+    mov x, osr               side 0x02
+loop:
+    jmp !x start            side 0x00
+    jmp x-- loop            side 0x02
+% c-sdk {
+static inline void test_side_program_init(PIO pio, uint sm, uint offset, uint sideset_base, float div) {
+    pio_sm_config c =  test_side_program_get_default_config(offset);
+
+    // Set sideset (SCLK/CS)
+    sm_config_set_sideset_pins(&c, sideset_base);
+    // Set clk div
+    sm_config_set_clkdiv(&c, div);
+    // Set this pin's GPIO function (connect PIO to the pad)
+    pio_gpio_init(pio, sideset_base);
+    pio_gpio_init(pio, sideset_base+1);
+    // Set the pin direction to output at the PIO
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base, 1, true);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base+1, 1, true);
+
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

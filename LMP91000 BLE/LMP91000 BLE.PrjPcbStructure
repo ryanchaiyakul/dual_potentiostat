@@ -1,0 +1,4 @@
+Record=TopLevelDocument|FileName=ADC Driver.SchDoc|SheetNumber=4
+Record=NoMainPathDocument|SourceDocument=ADC Driver.SchDoc|FileName=Analog.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=ADC Driver.SchDoc|FileName=MCU.SchDoc|SheetNumber=2
+Record=NoMainPathDocument|SourceDocument=ADC Driver.SchDoc|FileName=Power.SchDoc|SheetNumber=3

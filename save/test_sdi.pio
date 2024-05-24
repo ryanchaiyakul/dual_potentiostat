@@ -1,0 +1,44 @@
+;
+; Copyright (c) 2020 Raspberry Pi (Trading) Ltd.
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+.program test_sdi
+.side_set 2
+
+; Repeatedly get one word of data from the TX FIFO, stalling when the FIFO is
+; empty. Write the least significant bit to the OUT pin group.
+
+start:
+    pull                   side 3     
+    set    x, 15           side 3  
+sdi_write:        
+    out    pins, 1         side 2
+    jmp    x--, sdi_write  side 0     
+    set    x, 30           side 2     
+loop:
+    jmp    !x, start       side 0     
+    jmp    x--, loop       side 2     
+
+% c-sdk {
+static inline void hello_program_init(PIO pio, uint sm, uint offset, uint sdi, uint sideest_base, float div) {
+    pio_sm_config c =  test_sdi_program_get_default_config(offset);
+    // Set sideset (SCLK/CS)
+    sm_config_set_sideset_pins(&c, sideset_base);
+    pio_gpio_init(pio, sideset_base);
+    pio_gpio_init(pio, sideset_base+1);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base, 1, true);
+    pio_sm_set_consecutive_pindirs(pio, sm, sideset_base+1, 1, true);
+    // Set out (SDI)
+    sm_config_set_out_pins(&c, sdi, 1);
+    pio_gpio_init(pio, sdi);
+    pio_sm_set_consecutive_pindirs(pio, sm, sdi, 1, true);
+    // Set clk div
+    sm_config_set_clkdiv(&c, div);
+    // Load our configuration, and jump to the start of the program
+    pio_sm_init(pio, sm, offset, &c);
+    // Set the state machine running
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}

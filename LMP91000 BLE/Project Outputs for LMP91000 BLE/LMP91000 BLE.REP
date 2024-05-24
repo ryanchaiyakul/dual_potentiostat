@@ -1,0 +1,512 @@
+*************************************************************
+FileName = LMP91000 BLE.GBR
+AutoAperture = True
+*************************************************************
+Generating : Bottom Layer
+      File : LMP91000 BLE.GBL
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D18
+    D24
+    D31
+    D52
+    D53
+    D56
+    D57
+    D60
+    D61
+    D62
+    D63
+    D64
+    D65
+    D66
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+*************************************************************
+
+*************************************************************
+Generating : Bottom Pad Master
+      File : LMP91000 BLE.GPB
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D24
+    D31
+    D52
+    D53
+    D62
+    D63
+    D64
+    D65
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+*************************************************************
+
+*************************************************************
+Generating : Top Pad Master
+      File : LMP91000 BLE.GPT
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+    D52
+    D53
+    D55
+    D62
+    D63
+    D64
+    D65
+*************************************************************
+
+*************************************************************
+Generating : Top Overlay
+      File : LMP91000 BLE.GTO
+
+    Adding Layer      : Top Overlay
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+    D18
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay
+      File : LMP91000 BLE.GBO
+
+    Adding Layer      : Bottom Overlay
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Top Solder
+      File : LMP91000 BLE.GTS
+
+    Adding Layer      : Top Solder
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D20
+    D23
+    D24
+    D27
+    D28
+    D29
+    D30
+    D32
+    D33
+    D34
+    D36
+    D37
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D54
+*************************************************************
+
+*************************************************************
+Generating : Bottom Solder
+      File : LMP91000 BLE.GBS
+
+    Adding Layer      : Bottom Solder
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D24
+    D44
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D73
+    D74
+    D75
+    D76
+    D77
+    D79
+*************************************************************
+
+*************************************************************
+Generating : Top Paste
+      File : LMP91000 BLE.GTP
+
+    Adding Layer      : Top Paste
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+*************************************************************
+
+*************************************************************
+Generating : Bottom Paste
+      File : LMP91000 BLE.GBP
+
+    Adding Layer      : Bottom Paste
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D24
+    D31
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+*************************************************************
+
+*************************************************************
+Generating : Keep-Out Layer
+      File : LMP91000 BLE.GKO
+
+    Adding Layer      : Keep-Out Layer
+
+
+Used DCodes :
+    D18
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 1
+      File : LMP91000 BLE.GM1
+
+    Adding Layer      : Mechanical 1
+
+
+Used DCodes :
+*************************************************************
+
+*************************************************************
+Generating : GND
+      File : LMP91000 BLE.GP2
+
+    Adding Layer      : GND
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D67
+    D68
+    D69
+    D70
+    D71
+    D72
+*************************************************************
+
+*************************************************************
+Generating : Top Courtyard
+      File : LMP91000 BLE.GM3
+
+    Adding Layer      : Top Courtyard
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Bottom 3D Body
+      File : LMP91000 BLE.GM23
+
+    Adding Layer      : Bottom 3D Body
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Top Assembly
+      File : LMP91000 BLE.GM5
+
+    Adding Layer      : Top Assembly
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Bottom Courtyard
+      File : LMP91000 BLE.GM21
+
+    Adding Layer      : Bottom Courtyard
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Top 3D Body
+      File : LMP91000 BLE.GM2
+
+    Adding Layer      : Top 3D Body
+
+
+Used DCodes :
+    D15
+    D16
+    D80
+*************************************************************
+
+*************************************************************
+Generating : Bottom Component Center
+      File : LMP91000 BLE.GM24
+
+    Adding Layer      : Bottom Component Center
+
+
+Used DCodes :
+    D10
+*************************************************************
+
+*************************************************************
+Generating : VCC
+      File : LMP91000 BLE.GP1
+
+    Adding Layer      : VCC
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D67
+    D68
+    D69
+    D70
+    D71
+*************************************************************
+
+*************************************************************
+Generating : Top Layer
+      File : LMP91000 BLE.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D18
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+    D52
+    D53
+    D55
+    D56
+    D57
+    D58
+    D59
+    D60
+    D61
+    D62
+    D63
+    D64
+    D65
+    D66
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 13
+      File : LMP91000 BLE.GM13
+
+    Adding Layer      : Mechanical 13
+
+
+Used DCodes :
+    D10
+    D80
+    D81
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 15
+      File : LMP91000 BLE.GM15
+
+    Adding Layer      : Mechanical 15
+
+
+Used DCodes :
+    D10
+    D14
+    D82
+*************************************************************
+
+*************************************************************
+Generating : Top Component Center
+      File : LMP91000 BLE.GM16
+
+    Adding Layer      : Top Component Center
+
+
+Used DCodes :
+    D10
+*************************************************************
+
+*************************************************************
+Generating : Bottom Assembly
+      File : LMP91000 BLE.GM20
+
+    Adding Layer      : Bottom Assembly
+
+
+Used DCodes :
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Drill Drawing
+      File : LMP91000 BLE.GD1
+
+    Adding Drill Pair : Top Layer-Bottom Layer
+
+    Adding Layer      : Drill Drawing
+
+
+Used DCodes :
+    D13
+    D83
+*************************************************************
+
+*************************************************************
+Generating : Drill Guide
+      File : LMP91000 BLE.GG1
+
+    Adding Drill Pair : Top Layer-Bottom Layer
+
+    Adding Layer      : Drill Guide
+
+
+Used DCodes :
+    D13
+*************************************************************
+
+*************************************************************
+Generating : Profile
+      File : LMP91000 BLE.GM
+
+
+Used DCodes :
+    D84
+*************************************************************
+

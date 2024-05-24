@@ -1,0 +1,20 @@
+Add Component: Footprint Not Found My_1X02
+Add Component: Footprint Not Found My_1X02
+Added Component: Designator=P6(JST-B3B-PH-K-S-3_V)
+Add component (AddParameter): Name = "Datasheet URL"; Value = "https://datasheet.ciiva.com/11746/0900766b80826550-11746939.pdf"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Datasheet Version"; Value = "Oct-06"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer"; Value = "JST"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer URL"; Value = "http://www.jst.com/home2.html"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "No of Positions"; Value = "3"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Pitch"; Value = "2mm"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Style/Orientation"; Value = "StraightHeader/Plug"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Termination"; Value = "Crimp"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Type"; Value = "ShroudedHeader"; VariantName = "[No Variations]"
+Add Pin To Net: Unknown Pin: Pin P2-1
+Add Pin To Net: Unknown Pin: Pin P2-2
+Add Pin To Net: Unknown Pin: Pin P3-1
+Add Pin To Net: Unknown Pin: Pin P3-2
+Add Class Member: Failed to add class member : Component P2 Header 2
+Add Class Member: Failed to add class member : Component P3 Header 2
+Added Member To Class: ClassName=ADC Driver Member=Component P6 B3B-PH-K-S(LF)(SN)
+Added Member To Class: ClassName=MCU Member=Component  WIRL-BTLE_2612011024000
