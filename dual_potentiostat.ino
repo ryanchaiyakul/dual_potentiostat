@@ -56,9 +56,9 @@ unsigned long dpvSamplingOffsetUS = 1670;
 // SWV Settings
 
 // All in mV
-int swvStartMV = -50;
+int swvStartMV = -70;
 int swvVerticesMVs[4] = {0}; // up to 4 vertices
-int swvEndMV = -450;
+int swvEndMV = -500;
 int swvIncrE = 1;
 int swvAmplitude = 25;
 
@@ -260,6 +260,16 @@ void serialCMD(byte cmd)
     if (debug_f) {
       Serial.println("Debugging mode enabled");
     }
+    break;
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+    pStat.setGain(int(cmd)-0x30);
     break;
   default:
     break;

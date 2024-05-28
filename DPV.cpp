@@ -67,7 +67,6 @@ Action DPV::calculateAction()
         prevTime += sampleOffsetUS;
         if (prevTime >= getActiveTime())
         {
-            Serial.println("fk");
             return Action();
         }
         baseMV += incrE;
@@ -86,6 +85,5 @@ Action DPV::calculateAction()
         state = LOW_V;
         return Action(prevTime, UpdateStatus::SAMPLE, 0);
     }
-    Serial.println("fk");
     return Action();
 }
