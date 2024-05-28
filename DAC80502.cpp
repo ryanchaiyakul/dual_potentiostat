@@ -8,7 +8,7 @@ DAC80502::DAC80502(uint8_t cs, uint16_t refV)
 {
   this->refV = refV;
   this->cs = cs;
-  gain = 1;
+  gain = 2;
   sync = false;
 }
 
@@ -19,10 +19,9 @@ void DAC80502::init()
 {
   pinMode(cs, OUTPUT);
   digitalWrite(cs, HIGH); // Active low
-  SPI.begin(false);
-  DAC_WR(DAC80502_GAIN, 0x0103);
+  //DAC_WR(DAC80502_GAIN, 0x0103);
   //DAC_WR(DAC80502_CONFIG, 0b100000000);
-  //DAC_WR(DAC80502_GAIN, 0x0003);
+  DAC_WR(DAC80502_GAIN, 0x0003);
 }
 
 /**

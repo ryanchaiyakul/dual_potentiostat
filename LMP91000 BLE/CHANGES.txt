@@ -1,0 +1,2 @@
+ADD I2C Pullup (not needed but to be safe next version)
+3.3V SPI directly to DAC80502 and DAC80501 (Logic High starts at 1.62V oops .-.)

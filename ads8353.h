@@ -1,10 +1,17 @@
 #pragma once
 
-#define VREF 2.499
+#define VREF 2.5
 #define ADS8353_SDI 27
 #define ADS8353_SIDE_BASE 28
 #define ADS8353_SDO_BASE 2
 #define ADS8353_2N 65536
+
+class ADS8353Conversion {
+  public:
+    ADS8353Conversion(double A, double B) : A(A), B(B) {};
+    double A;
+    double B;
+};
 
 class ADS8353 {
 public:
@@ -12,8 +19,9 @@ public:
   void init_pio(PIO, uint);
   int init_adc();
   void set_mode(bool);
-  void do_conversion(uint32_t count);
+  ADS8353Conversion do_conversion(uint32_t count);
   float bin_to_float(const uint16_t bin);
+  uint16_t bin_to_mv(const uint16_t bin);
 private:
   PIO pio;
   uint sm;
@@ -41,10 +49,9 @@ void ADS8353::init_pio(PIO pio, uint sm) {
 
 int ADS8353::init_adc() {
   set_mode(false);
-  while(true) {
     // set CFR register
-  //pio_sm_put_blocking(pio, sm, 0b0000001001000001);
-  pio_sm_put_blocking(pio, sm, 0b0000000001000001);
+  pio_sm_put_blocking(pio, sm, 0b0000001001000001);
+  //pio_sm_put_blocking(pio, sm, 0b0000000001000001);
   pio_sm_get_blocking(pio, sm);
 
   // Read CFR register
@@ -54,10 +61,9 @@ int ADS8353::init_adc() {
   // Dummy command to get output of CRF read
   pio_sm_put_blocking(pio, sm, 0);
   uint32_t ret = pio_sm_get_blocking(pio, sm);
-  if (ret == 0b001000000000) {
-  //if (ret == 0b001001000000) {
+  //if (ret == 0b001000000000) {
+  if (ret == 0b001001000000) {
     return 0;
-  }
   }
   return 1;
 }
@@ -80,23 +86,25 @@ float ADS8353::bin_to_float(const uint16_t bin) {
   return 2 * VREF - (2 * VREF * bin / ADS8353_2N);
 }
 
-void ADS8353::do_conversion(uint32_t count) {
+uint16_t ADS8353::bin_to_mv(const uint16_t bin) {
+  return 5000 - (5000 * bin / ADS8353_2N);
+}
+
+ADS8353Conversion ADS8353::do_conversion(uint32_t count) {
   pio_sm_put_blocking(pio, sm, count+1);
+  double a_sum = 0;
+  double b_sum = 0;
   for (int i = 0; i < count; i++) {
     uint32_t ret = pio_sm_get_blocking(pio, sm);
-
     uint16_t bin_a, bin_b;
     bin_a = bin_b = 0;
     for (uint i = 0; i < 16; i++) {
       bin_b |= ((ret >> 2*i) & 0x01) << i;
       bin_a |= ((ret >> (2*i + 1)) & 0x01) << i;
     }
-
-    float a = bin_to_float(bin_a);
-    float b = bin_to_float(bin_b);
-
-    Serial.print(a, 4);
-    Serial.print("\t");
-    Serial.println(b, 4);
+    a_sum += bin_to_float(bin_a);
+    b_sum += bin_to_float(bin_b);
+    
   }
+  return ADS8353Conversion(a_sum / count, b_sum / count);
 }
