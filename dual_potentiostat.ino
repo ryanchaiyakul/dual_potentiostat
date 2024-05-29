@@ -65,7 +65,7 @@ int swvAmplitude = 25;
 int swvVertices = 0;
 
 // 10ms granularity (us)
-unsigned long swvFrequency = 60;     // Hz <= 200 Hz
+unsigned long swvFrequency = 45;     // Hz <= 200 Hz
 unsigned long swvQuietTime = 2000000; // Hold reference at swvTrueStartMV for x us
 unsigned long swvRelaxTime = 2000000; // Hold reference at swvTrueEndMV for x us
 unsigned long swvSamplingOffsetUS = 1000;
@@ -204,9 +204,20 @@ double setLMP91000(LMP91000 pStat, int16_t mv) {
   }
   uint bias = OPTIMAL_BIAS[abs(mv)-MIN_MV];
   uint16_t bin = DAC_BINARY[abs(mv)-MIN_MV];
-  dac2.DAC_WR(DAC80502_A, bin);
   pStat.setBias(bias);
+  dac2.DAC_WR(DAC80502_A, bin);
   return 2.5 * bin / 65536; // Pre divided by 2
+}
+
+double setLMP91000Debug(int16_t mv) {
+  if (abs(mv) < MIN_MV || abs(mv) > MAX_MV) {
+    return 0;
+  }
+  uint bias = OPTIMAL_BIAS[abs(mv)-MIN_MV];
+  uint16_t bin = DAC_BINARY[abs(mv)-MIN_MV];
+  Serial.print("Reconstructed Voltage: ");
+  Serial.println(TIA_BIAS[bias] * 5 * bin / 65536);
+  return 0.0;
 }
 
 void selectDPV()
@@ -338,6 +349,7 @@ void potentiostatMain() {
       Serial.print(micros() - start_time);
       Serial.print(',');
       Serial.println(method->getVoltage());
+      setLMP91000Debug(method->getVoltage());
       break;
     case SAMPLE:
       // Count # of sent samples and timing
