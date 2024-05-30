@@ -25,6 +25,7 @@
 #define SERIAL_MODE 0
 #define EXP_MODE 1
 #define DEB_MODE 2
+#define SWEEP_MODE 3
 
 #define MINMV -750           // WE-RE lowest voltage
 #define MAXMV 750            // WE-RE highest voltage
@@ -103,6 +104,10 @@ int i = 0;
 bool debug_f = false;
 unsigned long start_time;
 unsigned count;
+
+int gain;
+double LMP_OFFSET_SLOPE[7] = {0, 0, 0, 0, 0, -0.0222118, 0};
+double LMP_OFFSET_INT[7] = {0, 0, 0, 0, 0, 0.17254909, 0};
 
 
 Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
@@ -183,7 +188,7 @@ void setup() {
   pStat.standby();
   delay(50);
   pStat.disableFET();
-  pStat.setGain(6); //set the internal gain as zero, using the zero gain resistor as gain instead
+  pStat.setGain(5); //set the internal gain as zero, using the zero gain resistor as gain instead
   pStat.setRLoad(0); // 100 ohms load, by default
   pStat.setRefSource(1); // set the reference as the external souce
   pStat.setBiasSign(0); // negative bias
@@ -198,6 +203,10 @@ void setup() {
   selectSWV();
 }
 
+double getLMPOffset(double v) {
+  return v * LMP_OFFSET_SLOPE[gain] + LMP_OFFSET_INT[gain];
+}
+
 double setLMP91000(LMP91000 pStat, int16_t mv) {
   if (abs(mv) < MIN_MV || abs(mv) > MAX_MV) {
     return 0;
@@ -206,7 +215,7 @@ double setLMP91000(LMP91000 pStat, int16_t mv) {
   uint16_t bin = DAC_BINARY[abs(mv)-MIN_MV];
   pStat.setBias(bias);
   dac2.DAC_WR(DAC80502_A, bin);
-  return 2.5 * bin / 65536; // Pre divided by 2
+  return 5.0 * bin / 65536;
 }
 
 double setLMP91000Debug(int16_t mv) {
@@ -280,7 +289,11 @@ void serialCMD(byte cmd)
   case '5':
   case '6':
   case '7':
-    pStat.setGain(int(cmd)-0x30);
+    gain = int(cmd)-0x30;
+    pStat.setGain(gain);
+    break;
+  case 'p':
+    state = SWEEP_MODE;
     break;
   default:
     break;
@@ -306,29 +319,28 @@ void potentiostatMain() {
     case NONE:
       // TODO: Implement working burst mode
       if (is_ready) {
-        double mv_low = mv[0] - zero_v[0];
-        double mv_high = mv[1] - zero_v[1];
+        double mv_low = mv[0] - zero_v[0] / 2 - getLMPOffset(zero_v[0]);
+        double mv_high = mv[1] - zero_v[1] / 2  - getLMPOffset(zero_v[1]);
         Serial.println(mv_high - mv_low, 4);
         is_ready = false;
       } 
       
       break;
     case SHIFTV:
-      i = 1;
       if (high_low) {
-        i = 0;
+        zero_v[0] = setLMP91000(pStat, method->getVoltage());
+      } else {
+        zero_v[1] = setLMP91000(pStat, method->getVoltage());
       }
-      zero_v[i] = setLMP91000(pStat, method->getVoltage());
       break;  
     case SAMPLE:
       if (high_low) {
         mv[0]  = adc.do_conversion(SAMPLE_COUNT).A;
-        high_low = !high_low;
       } else {
         mv[1]  = adc.do_conversion(SAMPLE_COUNT).A;
         is_ready = true;
-        high_low = !high_low;
       }
+      high_low = !high_low;
       break;
     case DONE:
       // Send last sample if there was not time to send it
@@ -364,6 +376,18 @@ void potentiostatMain() {
     }
   }
   break;
+  case SWEEP_MODE:
+    for (uint16_t j = 0; j < 14; j++) {
+      pStat.setBias(j);
+      delay(100);
+      for (uint16_t i = 1520; i < 3300; i++) {
+        dac2.setA(i);
+        delay(5);
+        Serial.println(adc.do_conversion(SAMPLE_COUNT).A - (i/2000.0), 4);
+      }
+    }
+    state = SERIAL_MODE;
+    break;
   }
 }
 
