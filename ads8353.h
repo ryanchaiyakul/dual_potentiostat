@@ -83,11 +83,11 @@ void ADS8353::set_mode(bool is_conversion) {
 }
 
 float ADS8353::bin_to_float(const uint16_t bin) {
-  return 2 * VREF - (2 * VREF * bin / ADS8353_2N);
+  return 5.0 - 5.0 * bin / ADS8353_2N;
 }
 
 uint16_t ADS8353::bin_to_mv(const uint16_t bin) {
-  return 5000 - (5000 * bin / ADS8353_2N);
+  return 50000 - 5000 * bin / ADS8353_2N;
 }
 
 ADS8353Conversion ADS8353::do_conversion(uint32_t count) {

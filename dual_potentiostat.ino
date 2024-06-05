@@ -98,7 +98,7 @@ double mv[2];
 double zero_v[2];
 bool high_low = true;  // false on low cycle
 bool is_ready = false;
-int i = 0;
+int exp_count = 0;
 
 // Debug
 bool debug_f = false;
@@ -106,16 +106,16 @@ unsigned long start_time;
 unsigned count;
 
 int gain;
-double LMP_OFFSET_SLOPE[7] = {0, 0, 0, 0, 0, -0.0222118, 0};
-double LMP_OFFSET_INT[7] = {0, 0, 0, 0, 0, 0.17254909, 0};
+double LMP_OFFSET_SLOPE[8] = {-0.0222118, -0.0222118, -0.0222118, -0.0222118, -0.0222118, -0.0222118, -0.022209, -0.022209};
+double LMP_OFFSET_INT[8] = {0.17254909, 0.17254909, 0.17254909, 0.17254909, 0.17254909, 0.17254909, 0.1726519, 0.1726519};
 
 
 Adafruit_NeoPixel pixels(1, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 ADS8353 adc(ADS8353_SDI, ADS8353_SDO_BASE, ADS8353_SIDE_BASE);
 ProteusE ble(PROTEUS_RESET);
 LMP91000 pStat = LMP91000();
-DAC80502 dac(DAC80502_CS, 2500);
-DAC80502 dac2(DAC80501_CS, 2500);
+DAC80502 dac(DAC80502_CS, 2499);
+DAC80502 dac2(DAC80501_CS, 2499);
 
 DPV dpv(dpvStartMV,
         dpvEndMV,
@@ -166,7 +166,7 @@ void setup() {
   dac.init();
   dac2.init();
 
-  dac2.setA(2000);
+  dac2.setA(1520);
 
   // ADC
   uint sm = pio_claim_unused_sm(pio0, true);
@@ -203,8 +203,12 @@ void setup() {
   selectSWV();
 }
 
-double getLMPOffset(double v) {
-  return v * LMP_OFFSET_SLOPE[gain] + LMP_OFFSET_INT[gain];
+double getCurrent(double v, double zero_v) {
+  return v  - (zero_v * LMP_OFFSET_SLOPE[gain] + LMP_OFFSET_INT[gain]) - zero_v / 2;
+}
+
+double getCurrent2(double v, double zero_v) {
+  return v  - (zero_v * zero_v * 0.00248909 + zero_v * -0.03381545 + 0.18641749) - zero_v / 2;
 }
 
 double setLMP91000(LMP91000 pStat, int16_t mv) {
@@ -259,9 +263,9 @@ void serialCMD(byte cmd)
     else
     {
       state = EXP_MODE;
-      start_time = micros();
     }
     high_low = true;
+    exp_count = 0;
     method->reset();
     break;
   // DPV mode
@@ -305,7 +309,12 @@ void potentiostatMain() {
   {
   case SERIAL_MODE:
   {
-    if (Serial.available())
+    if (exp_count > 0) {
+      state = EXP_MODE;
+      high_low = true;
+      exp_count--;
+      method->reset();
+    } else if (Serial.available())
     {
       serialCMD(Serial.read());
     }
@@ -319,9 +328,9 @@ void potentiostatMain() {
     case NONE:
       // TODO: Implement working burst mode
       if (is_ready) {
-        double mv_low = mv[0] - zero_v[0] / 2 - getLMPOffset(zero_v[0]);
-        double mv_high = mv[1] - zero_v[1] / 2  - getLMPOffset(zero_v[1]);
-        Serial.println(mv_high - mv_low, 4);
+        double mv_high = mv[0] - zero_v[0];
+        double mv_low = mv[1] - zero_v[1];
+        Serial.println(mv_low - mv_high, 4); // flip to get I
         is_ready = false;
       } 
       
@@ -377,21 +386,22 @@ void potentiostatMain() {
   }
   break;
   case SWEEP_MODE:
-    for (uint16_t j = 0; j < 14; j++) {
-      pStat.setBias(j);
-      delay(100);
-      for (uint16_t i = 1520; i < 3300; i++) {
-        dac2.setA(i);
-        delay(5);
-        Serial.println(adc.do_conversion(SAMPLE_COUNT).A - (i/2000.0), 4);
-      }
+    dac2.setA(1520);
+    pStat.setBias(6);
+    delay(100);
+    for (uint16_t i = 1520; i < 3300; i++) {
+      dac2.setA(i);
+      delay(10);
+      Serial.println(adc.do_conversion(SAMPLE_COUNT).A, 4);
     }
     state = SERIAL_MODE;
     break;
   }
 }
 
+
 // the loop routine runs over and over again forever:
 void loop() {
   potentiostatMain();
+  //Serial.println(adc.do_conversion(SAMPLE_COUNT).A, 4);
 }
